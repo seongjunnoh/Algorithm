@@ -49,6 +49,16 @@ public class Main {
         return true;
     }
 
+    static boolean isNoBingsan() {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (board[i][j] > 0) return false;           // 빙산이 있음
+            }
+        }
+
+        return true;           // 빙산이 없음 -> 0 이 정답
+    }
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -71,25 +81,17 @@ public class Main {
             }
         }
 
+        // 예외처리 : 빙산이 처음부터 하나도 없을 경우
+        if (isNoBingsan()) {
+            bw.write("0");
+            bw.flush();
+            bw.close();
+            br.close();
+            return;
+        }
+
         int year = 1;
         while (true) {
-            // 0이 정답인 경우
-            boolean isThereBingsan = false;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    if (board[i][j] > 0) isThereBingsan = true;
-                }
-            }
-
-            // 빙산이 하나도 없을때까지 while 문 탈출 X -> 0이 정답
-            if (!isThereBingsan) {
-                bw.write("0");
-                bw.flush();
-                bw.close();
-                br.close();
-                return;
-            }
-
             while (!queue.isEmpty()) {
                 Pair cur = queue.poll();        // 현재 빙산 위치
                 int count = 0;                  // 현재 빙산 위치와 맞닿아있는 바다 수
@@ -113,24 +115,16 @@ public class Main {
                     }
                 }
             }
-            
-            // 0이 정답인 경우
-            isThereBingsan = false;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    if (board[i][j] > 0) isThereBingsan = true;
-                }
-            }
 
-            // 빙산이 하나도 없을때까지 while 문 탈출 X -> 0이 정답
-            if (!isThereBingsan) {
+            // 1년 후 빙산이 없을 경우
+            if (isNoBingsan()) {
                 bw.write("0");
                 bw.flush();
                 bw.close();
                 br.close();
                 return;
             }
-            
+
             // board의 빙산이 분리된 경우 체크
             if (!checkBingsan(queue.peek().x, queue.peek().y)) {
                 bw.write(String.valueOf(year));

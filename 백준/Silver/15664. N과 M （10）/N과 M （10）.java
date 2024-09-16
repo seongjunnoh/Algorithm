@@ -5,25 +5,26 @@ import java.io.*;
 public class Main {
 
     static int n, m;
-    static StringBuilder sb;
+    static StringBuilder sb = new StringBuilder();
     static int[] arr;
     static int[] input;
-    static LinkedHashSet<String> ans = new LinkedHashSet<>();
 
     static void dfs(int start, int depth) {
         if (depth == m) {
-            sb = new StringBuilder();
             for (int i = 0; i < m; i++) {
                 sb.append(arr[i]).append(" ");
             }
-
-            ans.add(sb.toString());         // hashSet에 add -> 중복된 결과이면 자동으로 삭제해줌
+            sb.append("\n");
 
             return;
         }
 
+        int before = 0;             // 해당 depth의 이전 값
         for (int i = start; i < n; i++) {
+            if (before == input[i]) continue;       // 중복 결과 제거
+
             arr[depth] = input[i];
+            before = input[i];
             dfs(i + 1, depth + 1);
         }
     }
@@ -48,9 +49,7 @@ public class Main {
 
         dfs(0, 0);
 
-        for (String s : ans) {
-            bw.write(s + "\n");
-        }
+        bw.write(sb.toString());
         bw.flush();
         bw.close();
         br.close();

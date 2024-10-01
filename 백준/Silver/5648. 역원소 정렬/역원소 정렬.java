@@ -8,58 +8,30 @@ public class Main {
         StringTokenizer st = new StringTokenizer(br.readLine());
 
         int n = Integer.parseInt(st.nextToken());
-        String[] input = new String[n];
 
-        // 입력 이렇게 받는게 맞나??
-        int idx = 0;
-        while (st.countTokens() != 0) {
-            input[idx] = st.nextToken();
-            idx++;
-        }
+        List<Long> numbers = new ArrayList<>();     // 역순 변환된 숫자를 저장할 리스트
 
-        while (idx < n) {
-            st = new StringTokenizer(br.readLine());
+        // 입력받아서 numbers에 add
+        while (numbers.size() < n) {
+            while (st.hasMoreTokens()) {
+                String reversedNum = new StringBuilder(st.nextToken()).reverse().toString();
+                numbers.add(Long.parseLong(reversedNum));
+                if (numbers.size() == n) break;
+            }
 
-            while (st.countTokens() != 0) {
-                input[idx] = st.nextToken();
-                idx++;
+            if (numbers.size() < n) {
+                st = new StringTokenizer(br.readLine());
             }
         }
 
-        for (int i = 0; i < n; i++) {
-            String cur = input[i];
-            Stack<Character> stack = new Stack<>();
+        Collections.sort(numbers);
 
-            int length = cur.length();
-            for (int j = 0; j < length; j++) {
-                stack.push(cur.charAt(j));
-            }
-
-            StringBuilder sb = new StringBuilder();
-            boolean isFirst = true;
-            while (!stack.isEmpty()) {
-                Character pop = stack.pop();
-                if (isFirst && pop == '0') continue;
-
-                sb.append(pop);
-                isFirst = false;
-            }
-
-            input[i] = sb.toString();
+        StringBuilder sb = new StringBuilder();
+        for (Long num : numbers) {
+            sb.append(num).append("\n");
         }
+        System.out.println(sb);
 
-        // input 을 long 배열로 변경
-        long[] inputToLong = new long[n];
-        for (int i = 0; i < n; i++) {
-            inputToLong[i] = Long.parseLong(input[i]);
-        }
-
-        Arrays.sort(inputToLong);
-
-        int size = input.length;
-        for (int i = 0; i < size; i++) {
-            System.out.println(inputToLong[i]);
-        }
         br.close();
     }
 }

@@ -10,11 +10,7 @@ public class Main {
         String[] arr = new String[input.length()];
 
         for (int i = 0; i < input.length(); i++) {
-            StringBuilder sb = new StringBuilder();
-            for (int start = i; start < input.length(); start++) {
-                sb.append(input.charAt(start));
-            }
-            arr[i] = sb.toString();
+            arr[i] = input.substring(i);
         }
 
         Arrays.sort(arr);

@@ -9,13 +9,15 @@ public class Main {
 
     static int dp(int index, int remain) {
         if (remain == 0) return 1;
-        if (index == n) return 0;           
+        if (index == n) return 0;
         if (saved[index][remain] != -1) return saved[index][remain];
 
-        int maxCount = remain / values[index];          // values[index]의 가능한 최대 개수
-        saved[index][remain] = 0;       // -1 -> 0 으로 update
-        for (int count = maxCount; count >= 0; count--) {
-            saved[index][remain] += dp(index + 1, remain - values[index] * count);
+        // values[index]를 포함하지 않는 경우
+        saved[index][remain] = dp(index + 1, remain);
+
+        // values[index]를 포함하는 경우 (포함할 수 있다면)
+        if (remain >= values[index]) {
+            saved[index][remain] += dp(index, remain - values[index]);
         }
 
         return saved[index][remain];
@@ -31,8 +33,7 @@ public class Main {
         for (int i = 0; i < n; i++) {
             values[i] = Integer.parseInt(br.readLine());
         }
-
-        Arrays.sort(values, Collections.reverseOrder());        // 내림차순 정렬
+        // values를 정렬하는 과정이 없어도 가능할 듯
 
         saved = new int[n][k+1];
         for (int i = 0; i < n; i++) {

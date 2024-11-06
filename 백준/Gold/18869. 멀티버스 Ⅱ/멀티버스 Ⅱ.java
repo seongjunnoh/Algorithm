@@ -21,16 +21,13 @@ public class Main {
 
             // temp 배열 정렬 후, 좌표 압축
             Arrays.sort(temp);
-            Map<Integer, Integer> map = new HashMap<>();
-            int rank = 0;
+            int[] unique = Arrays.stream(temp).distinct().toArray();        // temp 에서 중복하는 수 제거
             for (int j = 0; j < n; j++) {
-                if (!map.containsKey(temp[j])) map.put(temp[j], rank++);
+                int rank = Arrays.binarySearch(unique, space[j]);           // 이분탐색으로 space[j] 의 rank 구하기
+                space[j] = rank;
             }
 
-            // arr[i] 에 rank 결과 입력
-            for (int j = 0; j < n; j++) {
-                universe[i][j] = map.get(space[j]);
-            }
+            universe[i] = space;
         }
 
         int result = 0;

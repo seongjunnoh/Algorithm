@@ -16,21 +16,23 @@ public class Main {
 
         Arrays.sort(arr);
 
+        int before = 0;
         long min = Long.MAX_VALUE;
-        for (int i = 1; i < n; i++) {
-            long target = arr[i - 1];
+        for (int i = 0; i < n; i++) {
             int l = i;
-            int r = n - 1;
+            int r = before;
 
-            while (l <= r) {
-                int mid = (l + r) / 2;
-
-                if (arr[mid] - target >= m) r = mid - 1;
-                else l = mid + 1;
+            boolean flag = true;
+            while (arr[r] - arr[l] < m){
+                if (r == n - 1) {
+                    flag = false;
+                    break;
+                }
+                r++;
             }
+            before = r;
 
-            if (l == n) l = n - 1;      // 예외처리
-            if (arr[l] - target >= m) min = Math.min(min, arr[l] - target);
+            if (flag) min = Math.min(min, arr[r] - arr[l]);
         }
 
         System.out.println(min);
@@ -44,7 +46,6 @@ public class Main {
  * n개의 수 중, 2개씩 쌍 고르고 & 고른 쌍들 중 차이가 m이상인 것들 중 최솟값 구하기
  * -> n 제곱 -> 시간초과
  *
- * => 정렬 후, 자신의 뒤의 수 중 차이가 m이상인 최소의 수를 이분 탐색으로 구하기 (= lowerBound)
- * -> n * logn
+ * => 정렬 후, 투 포인터를 이용해 차이가 m 이상이 되는 쌍들 중, 최소값 구하기
  *
  */

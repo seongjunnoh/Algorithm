@@ -15,35 +15,23 @@ public class Main {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
+        int l = 0;
         int r = 0;
+        int count = 0;      // 현재 구간에서 제거한 홀수 개수
         int max = 0;
-        int length = 0;     // 연속한 짝수 부분수열의 길이
-        int count = 0;      // 홀수를 제거한 횟수
-        for (int l = 0; l < n; l++) {
-            if (arr[l] % 2 != 0) {      // 부분수열 시작 포인트 찾기 (짝수인 지점)
-                count--;
-                if (l == r) {
-                    count = 0;
-                    r = l + 1;
-                }
-                continue;
+
+        while (r < n) {     // 투 포인터
+            if (arr[r] % 2 != 0) count++;
+
+            while (count > k) {
+                if (arr[l] % 2 != 0) count--;
+                l++;
             }
 
-            while (r < n && count <= k) {
-                if (arr[r] % 2 == 0) length++;
-                else {
-                    if (count == k) break;
-                    count++;
-                }
+            // 현재 구간에서 짝수 최대 길이 계산
+            max = Math.max(max, r - l + 1 - count);
 
-                r++;
-            }
-
-            max = Math.max(max, length);
-
-            if (r == n) break;      // 더이상 l을 옮길 필요 없음
-
-            length--;       // arr[l]를 부분수열에서 빼기
+            r++;
         }
 
         System.out.println(max);
@@ -60,5 +48,9 @@ public class Main {
  * => arr 중 짝수인 곳에서 시작, 뒤로 이동하면서 홀수인것 삭제
  *    & 이 과정을 출발점을 계속 뒤로 이동하면서 반복
  *    => 투 포인터 기법
+ *    
+ * ---------------------------------------------------
+ * 앞에서부터 모든 연속하는 부분 수열 고려 & 그 중 중간 중간 홀수인것 제거한 것의 길이를 구하자
+ * -> r - l + 1 - count
  *
  */

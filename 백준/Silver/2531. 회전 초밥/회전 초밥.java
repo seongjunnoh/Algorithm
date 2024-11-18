@@ -12,47 +12,41 @@ public class Main {
         int k = Integer.parseInt(st.nextToken());
         int c = Integer.parseInt(st.nextToken());
 
-        int[] arr = new int[n + k - 1];
+        int[] arr = new int[n];
         for (int i = 0; i < n; i++) {
             arr[i] = Integer.parseInt(br.readLine());
         }
-        for (int i = n; i < n + k - 1; i++) {
-            arr[i] = arr[i - n];
+
+        int[] sushiCount = new int[d + 1];      // 초밥 종류별 개수
+        int uniqueCount = 0;                    // 현재 서로 다른 초밥 종류의 수
+        int maxCount = 0;
+
+        // 초기 k개의 초밥을 윈도우에 추가
+        for (int i = 0; i < k; i++) {
+            if (sushiCount[arr[i]]++ == 0) {    // 새로운 종류의 초밥
+                uniqueCount++;
+            }
         }
 
-        Queue<Integer> queue = new LinkedList<>();          // l 부터 r-1 까지의 초밥
-        queue.add(arr[0]);
-        int r = 1;
-        int l = 0;
-        int max = 1;
-        while (r < n + k - 1) {             // 회전 초밥이므로 l=n-1, r=l+k 인 것까지 생각해야 함
-            while  (r - l < k) {
-                queue.add(arr[r++]);        // queue에 초밥 add
+        // 슬라이딩 윈도우
+        for (int i = 0; i < n; i++) {
+            // 쿠폰 초밥 포함 여부 확인
+            int currentMax = uniqueCount + (sushiCount[c] == 0 ? 1 : 0);
+            maxCount = Math.max(maxCount, currentMax);
+
+            // 윈도우의 왼쪽 초밥 제거
+            if (--sushiCount[arr[i]] == 0) {
+                uniqueCount--;
             }
 
-            // queue -> set 으로 변환
-            Set<Integer> set = new HashSet<>(queue);
-
-            if (set.contains(c)) {
-                max = Math.max(max, set.size());
-            } else {
-                max = Math.max(max, set.size() + 1);
+            // 윈도우의 오른쪽 초밥 추가
+            int next = arr[(i + k) % n]; // 회전 초밥 처리
+            if (sushiCount[next]++ == 0) {
+                uniqueCount++;
             }
-
-            // queue에서 arr[l] 뺴기
-            queue.poll();
-            l++;
         }
 
-        System.out.println(max);
+        System.out.println(maxCount);
         br.close();
     }
 }
-
-/**
- * 실버 1 2531번 회전 초밥
- *
- * arr의 start, end를 투 포인터로 관리 (end = start + k - 1)
- * -> start 부터 end 까지 중, 서로 다른 초밥 개수 구히가 & c가 포함되어 있지 않으면 + 1
- *
- */

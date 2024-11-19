@@ -6,10 +6,12 @@ public class Main {
 
     static class Pair {
         int classNum;
+        int index;
         long ability;
 
-        Pair(int classNum, long ability) {
+        Pair(int classNum, int index, long ability) {
             this.classNum = classNum;
+            this.index = index;
             this.ability = ability;
         }
     }
@@ -43,34 +45,23 @@ public class Main {
 
         // 일단 각 학급의 첫번째 학생을 대표로 지정
         for (int i = 0; i < n; i++) {
-            pq.add(new Pair(i, arr[i][0]));
+            pq.add(new Pair(i, 0, arr[i][0]));
             max = Math.max(max, arr[i][0]);     // 현재 능력치가 최대인 학생
         }
-        Pair poll = pq.poll();      // 현재 능력치가 최소인 학생
 
-        result = Math.min(result, max - poll.ability);
-        if (result == 0) {      // 예외처리
-            System.out.println("0");
-            br.close();
-            return;
-        }
-
-        pointer[poll.classNum]++;       // 최소인 학급의 대표 변경
-
-        // 최소인 학급의 대표를 변경할 수 없을때까지 반복
-        while (pointer[poll.classNum] < m) {
-            pq.add(new Pair(poll.classNum, arr[poll.classNum][pointer[poll.classNum]]));
-            max = Math.max(max, arr[poll.classNum][pointer[poll.classNum]]);        // 현재 최대값
-            poll = pq.poll();       // 현재 최소값
-
+        while (true) {
+            Pair poll = pq.poll();          // 현재 능력치가 최소인 학생
             result = Math.min(result, max - poll.ability);
-            if (result == 0) {
-                System.out.println("0");
-                br.close();
-                return;
-            }
+            
+            if (result == 0) break;
 
-            pointer[poll.classNum]++;
+            int nextIndex = poll.index + 1;
+            if (nextIndex >= m) break;          // 더 이상 해당 학급에서의 대표를 변경할 수 없음 -> 탈출조건
+
+            long nextAbility = arr[poll.classNum][nextIndex];
+            pq.add(new Pair(poll.classNum, nextIndex, nextAbility));
+
+            max = Math.max(max, nextAbility);       // max update
         }
 
         System.out.println(result);
@@ -88,3 +79,4 @@ public class Main {
  * -> 여기서 최대, 최소 찾는 걸 우선순위 큐가 해준다면?? -> O(n제곱 * log n) => ok
  *
  */
+

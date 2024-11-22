@@ -10,10 +10,10 @@ public class Main {
         String end = st.nextToken();
         String realEnd = st.nextToken();
 
-        Set<String> enter = new HashSet<>();
-        Set<String> exit = new HashSet<>();
+        Set<String> set = new HashSet<>();
 
         String line;
+        int count = 0;
         while ((line = br.readLine()) != null) {
             line = line.trim();
             if (line.isEmpty()) break;
@@ -23,17 +23,15 @@ public class Main {
             String name = st.nextToken();
 
             // 입장 관리
-            if (time.compareTo(start) <= 0) enter.add(name);
+            if (time.compareTo(start) <= 0) set.add(name);
 
             // 퇴장 관리
-            if (time.compareTo(end) >= 0 && time.compareTo(realEnd) <= 0) exit.add(name);
-        }
-
-        // enter, exit 에 모두 존재하는 학생만이 출석 인정
-        int count = 0;
-        Iterator<String> iterator = enter.iterator();
-        while (iterator.hasNext()) {
-            if (exit.contains(iterator.next())) count++;
+            if (time.compareTo(end) >= 0 && time.compareTo(realEnd) <= 0) {
+                if (set.contains(name)) {
+                    count++;
+                    set.remove(name);       // 중복 카운트 막기 위해서
+                }
+            }
         }
 
         System.out.println(count);

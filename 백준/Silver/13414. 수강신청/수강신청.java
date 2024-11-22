@@ -3,56 +3,26 @@ import java.util.*;
 
 public class Main {
 
-    static class Pair {
-        String name;
-        int rank;
-
-        Pair(String name, int rank) {
-            this.name = name;
-            this.rank = rank;
-        }
-    }
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         int k = Integer.parseInt(st.nextToken());
         int l = Integer.parseInt(st.nextToken());
 
-        Stack<String> stack = new Stack<>();
+        Set<String> set = new LinkedHashSet<>();
         for (int i = 0; i < l; i++) {
-            stack.push(br.readLine());
+            String num = br.readLine();
+
+            if (set.contains(num)) set.remove(num);
+            set.add(num);
         }
 
-        Map<String, Integer> map = new HashMap<>();
-        int rank = 1;
-        while (!stack.isEmpty()) {
-            String pop = stack.pop();
-
-            if (!map.containsKey(pop)) map.put(pop, rank++);      // 뒤에서부터의 순위 기록
-        }
-
-        // map에서 수강신청 성공한 학생들 list로 옮기기
-        List<Pair> list = new ArrayList<>();
-        int size = map.keySet().size();
-        for (String num : map.keySet()) {
-            if (size - map.get(num) < k) list.add(new Pair(num, size - map.get(num)));
-        }
-
-        // list 정렬
-        Collections.sort(list, new Comparator<Pair>(){
-            @Override
-            public int compare(Pair p1, Pair p2) {
-                return p1.rank - p2.rank;
-            }
-        });
-
+        Iterator<String> iterator = set.iterator();
         StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (Pair pair : list) {
-            if (count == k) break;
-            sb.append(pair.name).append("\n");
-            count++;
+        while (iterator.hasNext()) {
+            if (count++ == k) break;
+            sb.append(iterator.next()).append("\n");
         }
 
         System.out.println(sb);
@@ -66,4 +36,7 @@ public class Main {
  * 대기목록의 중복 학생을 처리하기 위해 stack 저장 -> 역순으로 map에 순위 기록
  *
  * 출력시에도 순서유지한채로 출력해야 하는 듯
+ *
+ * ---------------------------------------------------
+ * LinkedHashSet 사용
  */

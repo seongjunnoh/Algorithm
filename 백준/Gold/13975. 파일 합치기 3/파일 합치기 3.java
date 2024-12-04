@@ -14,7 +14,7 @@ public class Main {
 
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < k; j++) {
-                pq.add((long) Integer.parseInt(st.nextToken()));        // 업캐스팅
+                pq.add(Long.parseLong(st.nextToken()));        
             }
 
             long sum = 0;

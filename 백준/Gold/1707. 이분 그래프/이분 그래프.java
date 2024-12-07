@@ -3,67 +3,40 @@ import java.util.*;
 
 public class Main {
 
-    static class Pair {
-        int binary;     // 0 -> a, 1 -> b
-        int num;
-
-        Pair(int binary, int num) {
-            this.binary = binary;
-            this.num = num;
-        }
-    }
-
-    static Map<Integer, List<Integer>> map;
-    static boolean[] visit;
-    static Set<Integer> a;
-    static Set<Integer> b;
+    static List<Integer>[] graph;       // 리스트의 배열로 graph 표현
+    static int[] color;         // 0 : 미방문, -1/1 : 2가지 색
     static StringBuilder sb = new StringBuilder();
+    static int v, e;
 
-    static void play() {
-        Queue<Pair> q = new LinkedList<>();
+    static void bfs() {
+        Queue<Integer> q = new LinkedList<>();
 
-        for (int num : map.keySet()) {
-            if (!visit[num]) {
-                visit[num] = true;
-                a.add(num);
+        for (int i = 1; i <= v; i++) {
+            if (color[i] == 0) {
+                color[i] = 1;
 
-                for (int near : map.get(num)) {
-                    if (!visit[near]) {
-                        visit[near] = true;
-                        b.add(near);
-                        q.add(new Pair(1, near));
+                for (int near : graph[i]) {
+                    if (color[near] == 0) {
+                        color[near] = -1;
+                        q.add(near);
                     }
                 }
             }
 
             // bfs
             while (!q.isEmpty()) {
-                Pair poll = q.poll();
-                List<Integer> list = map.get(poll.num);
+                Integer poll = q.poll();
 
-                for (int i = 0; i < list.size(); i++) {
-                    if (visit[list.get(i)]) {
-                        if (poll.binary == 0) {
-                            if (a.contains(list.get(i))) {
-                                sb.append("NO").append("\n");
-                                return;
-                            }
-                        } else {
-                            if (b.contains(list.get(i))) {
-                                sb.append("NO").append("\n");
-                                return;
-                            }
-                        }
-                    } else {
-                        visit[list.get(i)] = true;
+                for (int near : graph[poll]) {
+                    if (color[near] == color[poll]) {
+                        sb.append("NO").append("\n");
+                        return;
+                    }
 
-                        if (poll.binary == 0) {
-                            b.add(list.get(i));
-                            q.add(new Pair(1, list.get(i)));
-                        } else {
-                            a.add(list.get(i));
-                            q.add(new Pair(0, list.get(i)));
-                        }
+                    if (color[near] == 0) {
+                        if (color[poll] == -1) color[near] = 1;
+                        else color[near] = -1;
+                        q.add(near);
                     }
                 }
             }
@@ -79,27 +52,24 @@ public class Main {
         int k = Integer.parseInt(br.readLine());
         for (int i = 0; i < k; i++) {
             st = new StringTokenizer(br.readLine());
-            int v = Integer.parseInt(st.nextToken());
-            int e = Integer.parseInt(st.nextToken());
-            map = new HashMap<>();
-            visit = new boolean[v + 1];
-            a = new HashSet<>();
-            b = new HashSet<>();
-
-            for (int num = 1; num <= v; num++) {
-                map.put(num, new ArrayList<>());
+            v = Integer.parseInt(st.nextToken());
+            e = Integer.parseInt(st.nextToken());
+            graph = new ArrayList[v + 1];
+            for (int j = 1; j <= v; j++) {
+                graph[j] = new ArrayList<>();
             }
 
             for (int j = 0; j < e; j++) {
                 st = new StringTokenizer(br.readLine());
                 int x = Integer.parseInt(st.nextToken());
                 int y = Integer.parseInt(st.nextToken());
-
-                map.get(x).add(y);
-                map.get(y).add(x);
+                graph[x].add(y);
+                graph[y].add(x);
             }
 
-            play();
+            color = new int[v + 1];
+
+            bfs();
         }
 
         System.out.println(sb);

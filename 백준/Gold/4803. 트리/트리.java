@@ -3,32 +3,30 @@ import java.util.*;
 
 public class Main {
 
-    static List<Integer>[] graph;
-    static boolean[] visit;
-    static int result;
+    static int[] parent;
+    static boolean[] cycle;
 
-    static void bfs(int start) {
-        Queue<Integer> q = new LinkedList<>();
-        int n = 0;
-        int e = 0;      // node, edge 개수
+    static int find(int n) {
+        if (n == parent[n]) return n;
 
-        q.add(start);
-        visit[start] = true;
-        while (!q.isEmpty()) {
-            int poll = q.poll();
-            n++;
+        parent[n] = find(parent[n]);
+        return parent[n];
+    }
 
-            for (int near : graph[poll]) {
-                e++;
+    static void union(int x, int y) {
+        int rx = find(x);        // x의 루트
+        int ry = find(y);        // y의 루트
 
-                if (!visit[near]) {
-                    visit[near] = true;
-                    q.add(near);
-                }
-            }
+        if (rx == ry) cycle[rx] = true;       // x와 y의 루트가 같다 == 사이클 발생
+        else {
+            if (rx > ry) parent[rx] = ry;
+            else parent[ry] = rx;
         }
 
-        if (2 * (n - 1) == e) result++;     // tree 하나 추가
+        // 사이클 전파 -> 한쪽이 사이클이면, union 한 결과도 사이클
+        if (cycle[rx] || cycle[ry]) {
+            cycle[rx] = cycle[ry] = true;
+        }
     }
 
     public static void main(String[] args) throws IOException {
@@ -44,24 +42,24 @@ public class Main {
 
             if (n == 0 && m == 0) break;
 
-            graph = new ArrayList[n + 1];
+            parent = new int[n + 1];
+            cycle = new boolean[n + 1];
             for (int i = 1; i <= n; i++) {
-                graph[i] = new ArrayList<>();
+                parent[i] = i;
+                cycle[i] = false;
             }
 
             for (int i = 0; i < m; i++) {
                 st = new StringTokenizer(br.readLine());
                 int x = Integer.parseInt(st.nextToken());
                 int y = Integer.parseInt(st.nextToken());
-                graph[x].add(y);
-                graph[y].add(x);
+                union(x, y);
             }
 
-            // bfs로 연결요소 개수 찾기
-            visit = new boolean[n + 1];
-            result = 0;
+            // 트리 개수 계산
+            int result = 0;
             for (int i = 1; i <= n; i++) {
-                if (!visit[i]) bfs(i);
+                if (find(i) == i && !cycle[i]) result++;
             }
 
             if (result == 0) sb.append("Case " + count + ": No trees.").append("\n");

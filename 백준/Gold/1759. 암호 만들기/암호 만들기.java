@@ -5,7 +5,6 @@ class Solution_1759 {
 
     Set<Character> mo = new HashSet<>();
     char[] arr;
-    boolean[] visit;
     int l, c;
     Stack<Character> selected = new Stack<>();
     StringBuilder sb = new StringBuilder();
@@ -27,7 +26,6 @@ class Solution_1759 {
 
         Arrays.sort(arr);         // 알파벳 오름차순 정렬
 
-        visit = new boolean[c];
         back(0, 0);
 
         System.out.println(sb);
@@ -42,15 +40,9 @@ class Solution_1759 {
         }
 
         for (int i = startIdx; i < c; i++) {
-            if (!visit[i]) {
-                visit[i] = true;
-                selected.push(arr[i]);
-
-                back(count + 1, i + 1);
-
-                visit[i] = false;
-                selected.pop();
-            }
+            selected.push(arr[i]);
+            back(count + 1, i + 1);
+            selected.pop();
         }
     }
 

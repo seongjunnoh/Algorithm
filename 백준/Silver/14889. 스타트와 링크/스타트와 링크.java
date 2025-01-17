@@ -6,7 +6,7 @@ class Solution_14889 {
 
     int n;
     int[][] map;
-    Stack<Integer> select = new Stack<>();
+    boolean[] visit;
     int min = Integer.MAX_VALUE;
 
     void solution() throws IOException {
@@ -21,6 +21,7 @@ class Solution_14889 {
             }
         }
 
+        visit = new boolean[n];
         back(0, 0);
 
         System.out.println(min);
@@ -34,37 +35,35 @@ class Solution_14889 {
         }
 
         for (int i = start; i < n; i++) {
-            select.push(i);
-            back(i + 1, count + 1);
-            select.pop();
+            if (!visit[i]) {
+                visit[i] = true;
+                back(i + 1, count + 1);
+                visit[i] = false;
+            }
         }
     }
 
     void cal() {
-        Set<Integer> set = new HashSet<>(select);
-        List<Integer> team1 = new ArrayList<>(select);
-        List<Integer> team2 = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            if (!set.contains(i)) team2.add(i);
-        }
-
         int val1 = 0;
         int val2 = 0;
 
-        for (int i = 0; i < team1.size(); i++) {
-            for (int j = i + 1; j < team1.size(); j++) {
-                val1 += map[team1.get(i)][team1.get(j)];
-                val1 += map[team1.get(j)][team1.get(i)];
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (visit[i] && visit[j]) {         // i,j는 스타트 팀
+                    val1 += map[i][j];
+                    val1 += map[j][i];
+                }
             }
         }
 
-        for (int i = 0; i < team2.size(); i++) {
-            for (int j = i + 1; j < team2.size(); j++) {
-                val2 += map[team2.get(i)][team2.get(j)];
-                val2 += map[team2.get(j)][team2.get(i)];
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (!visit[i] && !visit[j]) {         // i,j는 링크 팀
+                    val2 += map[i][j];
+                    val2 += map[j][i];
+                }
             }
         }
-
         min = Math.min(min, Math.abs(val1 - val2));
     }
 }

@@ -4,18 +4,16 @@ import java.lang.*;
 
 class Node_1916 implements Comparable<Node_1916> {
     int num;            // 노드 번호
-    long w;             // 해당 노드로 오는 에지의 가중치
+    int w;             // 해당 노드로 오는 에지의 가중치
 
-    Node_1916(int num, long w) {
+    Node_1916(int num, int w) {
         this.num = num;
         this.w = w;
     }
 
     @Override
     public int compareTo(Node_1916 n) {         // 가중치 기준 오름차순 정렬
-        if (this.w < n.w) return -1;
-        else if (this.w == n.w) return 0;
-        return 1;
+        return this.w - n.w;
     }
 }
 
@@ -23,8 +21,8 @@ class Solution_1916 {
 
     List<Node_1916>[] graph;
     boolean[] visit;
-    long[] dist;
-    final long INF = 10_000_000_000L;
+    int[] dist;
+    final int INF = 100_000_000;
     int start, end;
 
     void solution() throws IOException {
@@ -52,7 +50,7 @@ class Solution_1916 {
 
         // 다익스트라
         visit = new boolean[n + 1];
-        dist = new long[n + 1];
+        dist = new int[n + 1];
         Arrays.fill(dist, INF);
         dist[start] = 0;
         dijkstra();
@@ -96,4 +94,6 @@ public class Main {
  * 플로이드 알고리즘 -> 시간 초과
  * 다익스트라 알고리즘 -> ok
  *
+ * --------------------------
+ * long 이 아니라 int로 해도 충분할듯 (10의 10제곱이 아니라, 10의 8제곱으로 초기화해도 ok)
  */

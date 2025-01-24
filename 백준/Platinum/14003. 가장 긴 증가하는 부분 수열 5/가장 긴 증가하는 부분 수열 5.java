@@ -1,16 +1,6 @@
 import java.io.*;
 import java.util.*;
 
-class Pair_14003 {
-    int idx;        // arr에서의 idx 값
-    int value;      // arr[idx]의 value
-
-    Pair_14003(int idx, int value) {
-        this.idx = idx;
-        this.value = value;
-    }
-}
-
 class Solution_14003 {
     void solution() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -21,14 +11,14 @@ class Solution_14003 {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        Pair_14003[] lis = new Pair_14003[n];
+        int[] lis = new int[n];
         int[] idx = new int[n];     // idx[i] : arr[i] 원소가 lis에서 가지는 혹은 가졌던 idx 값
-        lis[0] = new Pair_14003(0, arr[0]);
+        lis[0] = arr[0];
         idx[0] = 0;
         int end = 0;
         for (int i = 1; i < n; i++) {
-            if (lis[end].value < arr[i]) {
-                lis[end + 1] = new Pair_14003(i, arr[i]);
+            if (lis[end] < arr[i]) {
+                lis[end + 1] = arr[i];
                 idx[i] = end + 1;
                 end++;
             } else {
@@ -36,12 +26,12 @@ class Solution_14003 {
                 int r = end;
                 while (l <= r) {
                     int mid = (l + r) / 2;
-                    if (lis[mid].value >= arr[i]) r = mid - 1;
+                    if (lis[mid] >= arr[i]) r = mid - 1;
                     else l = mid + 1;
                 }
 
                 idx[i] = l;
-                lis[l] = new Pair_14003(i, arr[i]);
+                lis[l] = arr[i];
             }
         }
 

@@ -52,17 +52,16 @@ class Solution_14003 {
         StringBuilder sb = new StringBuilder();
         sb.append(end + 1).append("\n");
 
-        List<Integer> result = new ArrayList<>();
+        Stack<Integer> result = new Stack<>();          // 거꾸로 바꾸기 -> stack 발상
         for (int i = n - 1; i >= 0; i--) {
             if (idx[i] == end) {
-                result.add(arr[i]);
+                result.push(arr[i]);
                 end--;
             }
         }
-        Collections.sort(result);           // lis이므로 오름차순 정렬
 
-        for (Integer num : result) {
-            sb.append(num).append(" ");
+        while (!result.isEmpty()) {
+            sb.append(result.pop()).append(" ");
         }
         System.out.println(sb);
         br.close();

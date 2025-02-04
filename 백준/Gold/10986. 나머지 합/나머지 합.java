@@ -15,17 +15,17 @@ class Solution_10986 {
         }
 
         // 누적합을 m으로 나눈 나머지를 기준으로 분류
-        Map<Integer, Integer> map = new HashMap<>();        // key : 나머지, val : m으로 나눈 나머지가 key인 누적합의 개수
+        int[] count = new int[m];       // count[i] : m으로 나눈 나머지가 i인 누적합의 개수
         for (int i = 1; i <= n; i++) {
             int remain = (int)(sum[i] % m);
-            map.put(remain, map.getOrDefault(remain, 0) + 1);
+            count[remain]++;
         }
 
         long total = 0;      // 정답
-        for (int key : map.keySet()) {
-            if (key == 0) total += map.get(key);
+        for (int i = 0; i < m; i++) {
+            if (i == 0) total += count[i];
 
-            total += comb(map.get(key), 2);
+            total += comb(count[i], 2);
         }
 
         System.out.println(total);

@@ -86,11 +86,11 @@ class Solution_1504 {
         pq.add(new Edge_1504(a, 0));
 
         while (!pq.isEmpty()) {
-            if (l[b] < INF) break;          // a -> b 까지의 최단 거리 구했으면 break
-            
             Edge_1504 poll = pq.poll();
             visit[poll.node] = true;
             l[poll.node] = Math.min(l[poll.node], poll.w);
+            
+            if (poll.node == b) break;          // 꺼낸 노드가 b이면 break
 
             for (Edge_1504 near : graph[poll.node]) {
                 if (!visit[near.node] && l[near.node] > near.w + poll.w) {           // pq에 add하는 조건 추가

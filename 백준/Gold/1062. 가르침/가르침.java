@@ -1,10 +1,11 @@
 import java.io.*;
 import java.util.*;
 
-class Solution_1062 {
+class Solution_1062_1 {
 
     int n, k;
     String[] arr;
+    int[] bit;
     boolean[] visit;
     int max = 0;
 
@@ -29,6 +30,16 @@ class Solution_1062 {
             return;
         }
 
+        bit = new int[n];         // bit[i] : arr[i]의 비트 표현
+        for (int i = 0; i < n; i++) {
+            String cur = arr[i];
+            int curBit = 0;
+            for (int j = 0; j < cur.length(); j++) {
+                curBit |= (1 << cur.charAt(j) - 'a');
+            }
+            bit[i] = curBit;
+        }
+
         visit = new boolean[26];
         visit['a' - 'a'] = true;
         visit['n' - 'a'] = true;
@@ -36,43 +47,38 @@ class Solution_1062 {
         visit['i' - 'a'] = true;
         visit['c' - 'a'] = true;
 
-        play(0, 0);
+        play(0, 5);
 
         System.out.println(max);
         br.close();
     }
 
     void play(int start, int get) {
-        if (get == k - 5) {
+        if (get == k) {
             cal();
             return;
         }
 
         for (int i = start; i < 26; i++) {
-            char c = (char) ((int) 'a' + i);
-            if (!visit[c - 'a']) {
-                visit[c - 'a'] = true;
+            if (!visit[i]) {
+                visit[i] = true;
                 play(i + 1, get + 1);
-                visit[c - 'a'] = false;
+                visit[i] = false;
             }
         }
     }
 
     void cal() {
-        int count = 0;
-
-        for (int i = 0; i < n; i++) {
-            String word = arr[i];
-
-            boolean flag = true;
-            for (int j = 0; j < word.length(); j++) {
-                if (!visit[word.charAt(j) - 'a']) {
-                    flag = false;
-                    break;
-                }
+        int visitBit = 0;
+        for (int i = 0; i < 26; i++) {
+            if (visit[i]) {
+                visitBit |= 1 << i;
             }
+        }
 
-            if (flag) count++;
+        int count = 0;      // 현재 visit 로 읽을 수 있는 단어 개수
+        for (int i = 0; i < n; i++) {
+            if ((bit[i] & visitBit) == bit[i]) count++;
         }
 
         max = Math.max(max, count);
@@ -81,7 +87,7 @@ class Solution_1062 {
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        Solution_1062 s = new Solution_1062();
+        Solution_1062_1 s = new Solution_1062_1();
         s.solution();
     }
 }
@@ -94,5 +100,8 @@ public class Main {
  * -> 이떄 최악의 경우는 21 choose 10 -> 352716 가지
  *
  * 총 시간복잡도 = 360000 * 50 * 15 = 270,000,000 (시간 초과) ??
+ * -----------------------------------------
+ * 백트래킹으로 미리 가지치기를 하니까 위와 같은 최악의 상황은 오지 않는듯
+ * cf) 비트마스킹으로 풀면 시간복잡도가 360000 * 50 으로 준다 (매번 알파벳 비교 안해도 되므로)
  *
  */

@@ -16,51 +16,39 @@ class Solution_10819 {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        Stack<Integer> stack = new Stack<>();
+        int[] select = new int[n];
         boolean[] visit = new boolean[n];
-        back(stack, visit);
+        back(select, visit, 0);
 
         System.out.println(max);
         br.close();
     }
 
-    void back(Stack<Integer> stack, boolean[] visit) {
-        if (stack.size() == n) {
-            cal(stack);
+    void back(int[] select, boolean[] visit, int idx) {
+        if (idx == n) {
+            cal(select);
             return;
         }
 
         for (int i = 0; i < n; i++) {
             if (!visit[i]) {
-                stack.push(arr[i]);
                 visit[i] = true;
+                select[idx] = arr[i];
 
-                back(stack, visit);
+                back(select, visit, idx + 1);
 
-                stack.pop();
                 visit[i] = false;
             }
         }
     }
 
-    void cal(Stack<Integer> stack) {
-        int[] temp = new int[n];
-        int idx = n - 1;
-        while (!stack.isEmpty()) {
-            temp[idx--] = stack.pop();
-        }
-
+    void cal(int[] select) {
         int sum = 0;
         for (int i = 0; i < n - 1; i++) {
-            sum += Math.abs(temp[i] - temp[i + 1]);
+            sum += Math.abs(select[i] - select[i + 1]);
         }
 
         max = Math.max(max, sum);
-
-        // 다시 stack에 넣기
-        for (int i = 0; i < n; i++) {
-            stack.push(temp[i]);
-        }
     }
 }
 
@@ -73,4 +61,5 @@ public class Main {
 
 /**
  * 모든 경우의 수 -> 8! -> ok
+ * 굳이 stack 사용할 필요는 없다
  */

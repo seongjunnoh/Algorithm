@@ -2,28 +2,25 @@ import java.io.*;
 import java.util.*;
 
 class Node_5639 {
-    int parent;
     int num;
-    int left;
-    int right;
+    Node_5639 left;
+    Node_5639 right;
 
-    Node_5639(int parent, int num, int left, int right) {
-        this.parent = parent;
+    Node_5639(int num) {
         this.num = num;
-        this.left = left;
-        this.right = right;
+        this.left = null;
+        this.right = null;
     }
 }
 
 class Solution_5639 {
 
-    Map<Integer, Node_5639> map;
-    int root;
+    List<Node_5639> list;
+    Node_5639 root;
     StringBuilder sb;
 
     void solution() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        map = new HashMap<>();
 
         // 루트 노드는 따로 입력받기
         String input = br.readLine();
@@ -31,8 +28,7 @@ class Solution_5639 {
             br.close();
             return;
         }
-        root = Integer.parseInt(input);
-        map.put(root, new Node_5639(-1, root, -1, -1));
+        root = new Node_5639(Integer.parseInt(input));
 
         while (true) {
             input = br.readLine();
@@ -49,41 +45,29 @@ class Solution_5639 {
         br.close();
     }
 
-    void add(int num, int child) {
-        Node_5639 node = map.get(num);
-
+    void add(Node_5639 node, int child) {
         if (node.num > child) {
-            if (node.left == -1) {
-                node.left = child;
-                map.put(child, new Node_5639(num, child, -1, -1));
+            if (node.left == null) {
+                node.left = new Node_5639(child);
                 return;
             }
-
             add(node.left, child);
         } else {
-            if (node.right == -1) {
-                node.right = child;
-                map.put(child, new Node_5639(num, child, -1, -1));
+            if (node.right == null) {
+                node.right = new Node_5639(child);
                 return;
             }
-
             add(node.right, child);
         }
     }
 
-    void postTravel(int num) {
-        Node_5639 node = map.get(num);      // 현재 노드
-        if (node.left != -1) {
-            postTravel(node.left);
-        }
-        if (node.right != -1) {
-            postTravel(node.right);
-        }
+    void postTravel(Node_5639 node) {
+        if (node == null) return;
 
-        sb.append(num).append("\n");
+        postTravel(node.left);
+        postTravel(node.right);
+        sb.append(node.num).append("\n");
     }
-
-
 }
 
 public class Main {
@@ -98,7 +82,7 @@ public class Main {
  *
  * 왼쪽 트리에는 항상 자신보다 작은 값, 오른쪽 트리에는 항상 자신보다 큰 값이 있어야 함
  *
- * add 연산 한번당 시간 복잡도 = 트리의 높이 = 최악의 경우 10000, 최선의 경우 14 정도 
+ * add 연산 한번당 시간 복잡도 = 트리의 높이 = 최악의 경우 10000, 최선의 경우 14 정도
  * & 총 노드 = 10000개
  * -> 총 시간 복잡도 = 10000 제곱 = 1억 -> ok ???
  */

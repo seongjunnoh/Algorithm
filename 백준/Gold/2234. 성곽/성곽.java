@@ -5,13 +5,13 @@ class Pair {
     int secNum;
     int x;
     int y;
-    String bi;
+    int rawVal;
     
-    Pair(int secNum, int x, int y, String bi) {
+    Pair(int secNum, int x, int y, int rawVal) {
         this.secNum = secNum;
         this.x = x;
         this.y = y;
-        this.bi = bi;
+        this.rawVal = rawVal;
     }
 }
 
@@ -22,6 +22,7 @@ class Solution {
     boolean[][] visit;
     int maxSecSize;
     int[][] pos = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};   // 남동북서 순서
+    int[] mask = {8, 4, 2, 1};  // 남동북서 순서
     Map<Integer, Integer> sizeMap;
     Map<Integer, Set<Integer>> nearMap;
     
@@ -36,15 +37,8 @@ class Solution {
         for (int i=0; i<m; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j=0; j<n; j++) {
-                int val = Integer.parseInt(st.nextToken());
-                String rawBi = Integer.toBinaryString(val);
-                String add = "";
-                for (int k=0; k<4 - rawBi.length(); k++) {
-                    add += "0";
-                }
-                String formatBi = add + rawBi;     // val을 4자리 이진수로 변환한 Str
-                
-                map[i][j] = new Pair(0, i, j, formatBi);
+                int rawVal = Integer.parseInt(st.nextToken());
+                map[i][j] = new Pair(0, i, j, rawVal);
             }
         }
         
@@ -125,8 +119,7 @@ class Solution {
                 
                 if (nX<0 || nX>=m || nY<0 || nY>=n) continue;
                 
-                String bi = poll.bi;
-                if (!visit[nX][nY] && bi.charAt(d) == '0') {
+                if (!visit[nX][nY] && (poll.rawVal & mask[d]) == 0) {    // 비트마스킹 활용
                     map[nX][nY].secNum = poll.secNum;   // 같은 구역으로 세팅
                     q.add(map[nX][nY]);
                     visit[nX][nY] = true;
@@ -149,5 +142,5 @@ public class Main
 
 /**
  * 3번째 연산을 위해서 모든 벽에 대한 제거를 고려할 필요는 없다
- * 
+ * 비트마스킹 활용할 수 있다
  */

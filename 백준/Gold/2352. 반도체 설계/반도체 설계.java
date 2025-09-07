@@ -34,8 +34,8 @@ class Solution {
     }
     
     int findIdx(int target, int len) { // tail 배열 중, target의 lower bound 찾기
-        int l = 0;
-        int r = len;
+        int l = 1;  // tail 배열은 1부터
+        int r = len;    // len 까지
         int mid;
         
         while (l <= r) {

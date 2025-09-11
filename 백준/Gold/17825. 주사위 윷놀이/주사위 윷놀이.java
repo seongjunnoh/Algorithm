@@ -7,8 +7,6 @@ class Solution {
     // 1~20 : 가장 바깥, 21~26 : 10번 파란길, 27~28 : 20번 파란길, 29~31 : 30번 파란길
     // 32 : 도착
     
-    // 10번 idx = 5, 20번 idx = 10, 30번 idx = 15, 25번 idx = 24
-    
     // r1 : route[0]~route[20] + route[32]
     // r2 : route[0]~route[5] + route[21]~route[26] + route[20] + route[32]
     // r3 : route[0]~route[10] + route[27]~route[28] + route[24]~route[26] + route[20] + route[32]
@@ -21,8 +19,12 @@ class Solution {
         28, 27, 26,  // 30번 파란 노드 타는 경로
         0
     };
-    int[] horse;    // route 상에서 각 말의 위치
-    int[] dice; // 주사위 
+    int[] next; // route[i]의 다음 노드 = next[route[i]]
+    int[] blue; // i번째 노드가 파란노드인 경우 : blue[i] = i번째 노드의 다음 노드(파란색 화살표)
+    int[][] move;   // 전이표, move[i][j] : i번째 노드에서 j만큼 이동할 경우 도착하는 노드의 idx
+    
+    int[] dice;
+    int[] horse;
     int max = 0;
     
     void solution() throws IOException {
@@ -34,9 +36,12 @@ class Solution {
             dice[i] = Integer.parseInt(st.nextToken());
         }
         
-        horse = new int[4];
-        Arrays.fill(horse, 0);  // 모든 말은 시작칸에서 출발
+        init();
+        makeMoveTable();
         
+        // 모든 말들 출발선에 위치
+        horse = new int[4]; // 말 4개
+        Arrays.fill(horse, 0);
         back(0, 0);
         
         System.out.println(max);
@@ -49,77 +54,93 @@ class Solution {
             return;
         }
         
-        for (int i=0; i<4; i++) {   // 말 이동
-            int curHorse = horse[i];
-            int curDice = dice[diceIdx];
+        int curDice = dice[diceIdx];
+        for (int i=0; i<4; i++) {
+            int cur = horse[i];
+            if (cur == 32) continue;
             
-            int nextHorse = calcNextHorse(curHorse, curDice);    // 이동시킨 말의 위치 계산
-            if (!canPick(nextHorse)) continue;  // 이동을 마치는 칸에 다른 말이 존재하는 경우
+            int next = move[cur][curDice];
             
-            horse[i] = nextHorse;
-            back(diceIdx + 1, sum + route[nextHorse]);
-            horse[i] = curHorse;    // 원상복구
+            // next 위치에 다른 말이 존재하는지 체크
+            if (!canMove(next)) continue;
+            
+            horse[i] = next;
+            back(diceIdx + 1, sum + route[next]);
+            horse[i] = cur; // 원상복구
         }
     }
     
-    boolean canPick(int nextHorse) {
-        if (nextHorse == 32) return true;   // 예외처리
+    boolean canMove(int nextHorse) {
+        if (nextHorse == 32) return true;
         
         for (int i=0; i<4; i++) {
             if (horse[i] == nextHorse) return false;
         }
-        
         return true;
     }
     
-    int calcNextHorse(int curHorse, int curDice) {
-        // 현재 파란점에 위치
-        if (curHorse == 5 || curHorse == 10 || curHorse == 15) {
-            if (curHorse == 5) return 21 + curDice - 1;
-            if (curHorse == 10) {
-                if (curDice <= 2) return 27 + curDice - 1;
-                return 24 + (curDice - 2) - 1;
-            }
-            if (curHorse == 15) {
-                if (curDice <= 3) return 29 + curDice - 1;
-                return 24 + (curDice - 3) - 1;
-            }
+    int step(int i, int j) {
+        if (i == 32) return 32;
+        
+        int cur = i;
+        int remain = j;
+        
+        if (blue[cur] != -1) {    // i번째 노드가 파란색 노드인 경우
+            cur = blue[cur];
+            remain--;
+        } else {
+            cur = next[cur];
+            remain--;
+        }
+        
+        while(remain > 0 && cur != 32) {
+            cur = next[cur];
+            remain--;
         } 
         
-        // 현재 빨간점에 위치
-        if (21 <= curHorse && curHorse <= 26) {
-            if (curHorse + curDice <= 26) return curHorse + curDice;
-            if (curHorse + curDice == 27) return 20;   // 40번 노드
-            return 32; // 도착
-        }
-        
-        if (27 <= curHorse && curHorse <= 28) {
-            if (curHorse + curDice <= 28) return curHorse + curDice;
-            if (curHorse + curDice < 32) return 24 + (curHorse + curDice - 29);
-            if (curHorse + curDice == 32) return 20;    // 40번 노드
-            return 32;  // 도착
-        }
-        
-        if (29 <= curHorse && curHorse <= 31) {
-            if (curHorse + curDice <= 31) return curHorse + curDice;
-            if (curHorse + curDice < 35) return 24 + (curHorse + curDice - 32);
-            if (curHorse + curDice == 35) return 20;    // 40번 노드
-            return 32; // 도착
-        }
-        
-        // 가장 마지막 경로에 위치한 경우
-        if (curHorse + curDice <= 20) return curHorse + curDice;
-        return 32;  // 도착
+        return cur;
     }
     
-    boolean move(int idx) {
+    void makeMoveTable() {
+        move = new int[33][6];
         
-        
-        for (int i=0; i<4; i++) {
-            if (horse[i] == idx) return false;
+        for (int i=0; i<=32; i++) {
+            for (int j=1; j<=5; j++) {
+                move[i][j] = step(i, j);
+            }
         }
+    }
+    
+    void init() {
+        next = new int[33];
+        blue = new int[33];
+        Arrays.fill(next, 32);  // 초기화
+        Arrays.fill(blue, -1);  // 초기화
         
-        return true;
+        // r1
+        next[0] = 1;
+        for (int i=1; i<20; i++) next[i] = i+1; 
+        next[20] = 32;
+        
+        // 파란 노드 분기처리
+        blue[5] = 21;
+        blue[10] = 27;
+        blue[15] = 29;
+        
+        // r2
+        for (int i=21; i<26; i++) {
+            next[i] = i+1;
+        }
+        next[26] = 20;
+        
+        // r3
+        next[27] = 28;
+        next[28] = 24;
+        
+        // r4
+        next[29] = 30;
+        next[30] = 31;
+        next[31] = 24;
     }
 }
 
@@ -133,7 +154,6 @@ public class Main {
 /**
  * 주사위 1번 던질때 말 4개 중 어떤 걸 움직일지 모든 경우의 수 구하기 -> 백트래킹
  * 
- * 말의 다음 위치를 구하는 로직을 어떻게 간편하게 할 수 있을까??
+ * 미리 특정 노드의 다음 노드가 어디인지,
+ * 특정 노드에서 1~5칸을 이동할 경우 어떤 노드로 이동하는지를 구하기
  */
- 
- 

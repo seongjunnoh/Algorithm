@@ -63,8 +63,13 @@ class Solution {
     }
     
     int ccw(Point a, Point b, Point c) {
-        long r = ((long)a.x*b.y + (long)b.x*c.y + (long)c.x*a.y) - 
-                    ((long)a.y*b.x + (long)b.y*c.x + (long)c.y*a.x);
+        long x1 = a.x - b.x;
+        long y1 = a.y - b.y;    // ab 벡터
+        
+        long x2 = a.x - c.x;
+        long y2 = a.y - c.y;    // ac 벡터
+        
+        long r = x1*y2 - y1*x2; // ab, ac 벡터 외적 z값
         if (r > 0) return 1;    // 반시계
         else if (r < 0) return -1;  // 시계
         else return 0;  // 일직선

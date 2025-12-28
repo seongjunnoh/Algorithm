@@ -34,10 +34,10 @@ class Solution {
         list.add(point);
       }
       
-      List<Integer> choice = new ArrayList<>();   // 선택된 + 점들
-      
+      boolean[] isPlus = new boolean[list.size()];
       min = Double.MAX_VALUE;
-      play(list, 0, choice);
+      
+      play(list, 0, isPlus, 0);
       
       sb.append(min).append("\n");
     }
@@ -46,28 +46,27 @@ class Solution {
     br.close();
   }
   
-  void play(List<int[]> list, int idx, List<Integer> choice) {
-    if (choice.size() == list.size() / 2) {    // + 점들 선택 완료
-      Set<Integer> choiceSet = new HashSet<>(choice);
-      min = Math.min(min, calc(list, choiceSet));    // 벡터 합 길이 계산
+  void play(List<int[]> list, int idx, boolean[] isPlus, int count) {
+    if (count == list.size() / 2) {    // + 점들 선택 완료
+      min = Math.min(min, calc(list, isPlus));    // 벡터 합 길이 계산
       return;
     }
     
     for (int i=idx; i<list.size(); i++) {
-      choice.add(i);
-      play(list, i+1, choice);
-      choice.remove(choice.size() - 1);   // 원복
+      isPlus[i] = true;
+      play(list, i+1, isPlus, count + 1);
+      isPlus[i] = false;    // 원상복구
     }
   }
   
-  double calc(List<int[]> list, Set<Integer> choiceSet) {
+  double calc(List<int[]> list, boolean[] isPlus) {
     int xPlus = 0, yPlus = 0;
     int xMinus = 0, yMinus = 0;
     
     for (int i=0; i<list.size(); i++) {
       int[] point = list.get(i);
       
-      if (choiceSet.contains(i)) {
+      if (isPlus[i]) {
         xPlus += point[0];
         yPlus += point[1];  
       } else {

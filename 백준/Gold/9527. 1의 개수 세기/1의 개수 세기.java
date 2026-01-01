@@ -12,7 +12,7 @@ class Solution {
         dp[0] = 0;
         dp[1] = 1;
         for (int i=2; i<60; i++) {
-            dp[i] = dp[i-1] * 2 + (long) Math.pow(2, i-1);
+            dp[i] = dp[i-1] * 2 + (1L << i-1);
         }
         
         System.out.println(calc(dp, b) - calc(dp, a-1));
@@ -23,9 +23,9 @@ class Solution {
         if (x == 0) return 0;   // s(0) = 0
         
         int t = 0;
-        while ((long) Math.pow(2, t) - 1 < x) t++;
+        while ((1L << t) - 1 < x) t++;
         
-        return dp[t-1] + (x - (long) Math.pow(2, t-1) + 1) + calc(dp, x - (long) Math.pow(2, t-1));
+        return dp[t-1] + (x - (1L << t-1) + 1) + calc(dp, x - (1L << t-1));
     }
 }
 

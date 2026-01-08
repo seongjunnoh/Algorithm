@@ -22,7 +22,7 @@ class Solution_9370 {
     int node;
     int[] dest;
     List<Node_9370>[] graph;
-    int[] startPath, hPath, gPath;
+    int[] startPath;
     boolean[] visit;
 
     void solution() throws IOException {
@@ -52,35 +52,30 @@ class Solution_9370 {
                 int to = Integer.parseInt(st.nextToken());
                 int w = Integer.parseInt(st.nextToken());
 
-                graph[from].add(new Node_9370(to, w));
-                graph[to].add(new Node_9370(from, w));
+                if ((from == g && to == h) || (from == h && to == g)) {
+                    graph[from].add(new Node_9370(to, w * 2 - 1));      // 가중치 홀수로
+                    graph[to].add(new Node_9370(from, w * 2 - 1));      // 가중치 홀수로
+                } else {
+                    graph[from].add(new Node_9370(to, w * 2));      // 가중치 짝수로
+                    graph[to].add(new Node_9370(from, w * 2));      // 가중치 짝수로
+                }
             }
 
             for (int j = 0; j < destSize; j++) {
                 dest[j] = Integer.parseInt(br.readLine());
             }
 
-            // 다익스트라 3번 (시작점이 start, h, g 3개)
+            // 다익스트라 1번만 (start 에서 출발)
             visit = new boolean[node + 1];
             startPath = new int[node + 1];
             Arrays.fill(startPath, INF);
             dijkstra(start, startPath);
 
-            hPath = new int[node + 1];
-            Arrays.fill(hPath, INF);
-            Arrays.fill(visit, false);
-            dijkstra(h, hPath);
-
-            gPath = new int[node + 1];
-            Arrays.fill(gPath, INF);
-            Arrays.fill(visit, false);
-            dijkstra(g, gPath);
-
             List<Integer> possibleDest = new ArrayList<>();
             for (int j = 0; j < destSize; j++) {
                 int d = dest[j];
 
-                if (startPath[d] == Math.min((startPath[h] + hPath[g] + gPath[d]), (startPath[g] + gPath[h] + hPath[d]))) {
+                if (startPath[d] % 2 == 1 && startPath[d] < INF) {        // start -> d 가 홀수이다 == g<->h 지났다
                     possibleDest.add(d);
                 }
             }
@@ -129,4 +124,8 @@ public class Main {
  * 일 경우 해당 dest는 불가능
  * 아닐 경우 해당 dest는 ok
  * -> 다익스트라 알고리즘으로 node->node 간의 최단거리 구하기
+ *
+ * ----------------------------------------------------------------------
+ * 다익스트라 3번 돌리지 않고 한번만으로 해결할 수 있음 -> 가중치 변형 트릭 적용
+ *
  */

@@ -5,22 +5,15 @@ class Solution {
     public int solution(int[] c) {  // 논문 인용 횟수
         Arrays.sort(c);     // 정렬
         
-        int answer = 0;
-        for (int i=0; i<=c.length; i++) {
-            int j;
-            for (j=0; j<c.length; j++) {
-                if (i > c[j]) continue;
-                break;
-            }
+        for (int i=0; i<c.length; i++) {
+            int count = c.length - i;   // 현재보다 인용횟수가 크거나 같은 논문 개수
+            int cur = c[i]; // 현재 논문 인용 횟수
             
-            // j : i번 미만 인용된 논문 개수, 전체-j : i번 이상 인용된 논문 개수
-            if (j < i && c.length - j >= i) {
-                answer = i;
+            if (cur >= count) {     // 현재
+                return count;
             }
-            
-            // System.out.println("i = " + i + ", j = " + j + ", answer = " + answer);
         }
     
-        return answer;
+        return 0;
     }
 }

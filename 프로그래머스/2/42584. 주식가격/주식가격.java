@@ -1,50 +1,30 @@
 import java.util.*;
 
-class Node {
-    int num;
-    int idx;
-    
-    Node (int num, int idx) {
-        this.num = num;
-        this.idx = idx;
-    }
-}
-
 class Solution {
     public int[] solution(int[] prices) {
-        ArrayDeque<Node> stack = new ArrayDeque<>();    // 아래일수록 숫자 작거나 같음
+        ArrayDeque<Integer> stack = new ArrayDeque<>();    // 인덱스 stack
         int[] answer = new int[prices.length];
         
         for (int i=0; i<prices.length; i++) {
-            if (stack.isEmpty()) {
-                stack.addLast(new Node(prices[i], i));
-                continue;
-            }
-            
-            boolean flag = false;
             while (!stack.isEmpty()) {
-                Node last = stack.peekLast();
+                int lastIdx = stack.peekLast();
 
-                if (last.num <= prices[i]) {    // 탈출
-                    stack.addLast(new Node(prices[i], i));
-                    flag = true;
+                if (prices[lastIdx] <= prices[i]) {    // 탈출
                     break;
                 }
 
                 // 가격이 떨어짐
                 stack.pollLast();
-                answer[last.idx] = i - last.idx;
+                answer[lastIdx] = i - lastIdx;
             }
             
-            if (!flag) {
-                stack.addLast(new Node(prices[i], i));
-            }
+            stack.addLast(i);  // push
         }
         
         // 스택에 남아있는 숫자들 처리
         while (!stack.isEmpty()) {
-            Node poll = stack.pollLast();
-            answer[poll.idx] = prices.length - 1 - poll.idx;
+            int poll = stack.pollLast();
+            answer[poll] = prices.length - 1 - poll;
         }
         
         return answer;

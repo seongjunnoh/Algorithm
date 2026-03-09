@@ -9,25 +9,25 @@ class Solution {
     int n = Integer.parseInt(line.split(" ")[0]);
     int h = Integer.parseInt(line.split(" ")[1]);
     
-    int[] down = new int[n/2];    // 석순 (n 짝수 보장)
-    int[] up = new int[n/2];    // 종유석
+    int[] down = new int[h+1];    // 석순
+    int[] up = new int[h+1];    // 종유석
     for (int i=0; i<n; i++) {
       int len = Integer.parseInt(br.readLine());
       
-      if (i%2 == 0) down[i/2] = len;
-      else up[i/2] = len;
+      // 특정 len의 종유석, 석순 개수 카운트
+      if (i%2 == 0) down[len]++;
+      else up[len]++;
     }
     
-    Arrays.sort(down);
-    Arrays.sort(up);
+    for (int i=h-1; i>=1; i--) {
+      down[i] += down[i+1];   // down[i] : 길이가 i이상인 석순 개수
+      up[i] += up[i+1];   // up[i] : 길이가 i이상인 종유석 개수
+    }
     
     int[] res = new int[h+1];   // res[i] : i 구간에서 걸리는 장애물 수
     for (int i=1; i<=h; i++) {
-      int count = 0;
-      count += n/2 - lowerbound(down, i);   // 충돌 == 전체 석순 - 길이가 i미만인 석순
-      count += n/2 - lowerbound(up, h-i+1); // 충돌 == 길이가 (h-i+1) 이상인 종유석 == 전체 종유석 - 길이가 h-i+1 미만인 종유석
-      
-      res[i] = count;
+      // 석순 i 이상 & 종유석 h-i+1 이상이어야 걸린다
+      res[i] = down[i] + up[h-i+1];   
     }
     
     Arrays.sort(res);
@@ -42,19 +42,6 @@ class Solution {
     System.out.println(min + " " + count);
     br.close();
   }
-  
-  int lowerbound(int[] arr, int curH) {
-    int l = 0;
-    int r = arr.length - 1;
-    while (l <= r) {
-      int mid = (l+r) / 2;
-      
-      if (arr[mid] >= curH) r = mid - 1;
-      else l = mid + 1;
-    }
-    
-    return l;   // curH 이상인 값이 최초 등장 인덱스 반환
-  }
 }
 
 public class Main {
@@ -68,3 +55,5 @@ public class Main {
 // h 개의 구간 존재 (i 구간 : 길이 i-1 ~ 길이 i 중간 지점)
 // 총 h개의 구간 탐색 & 각 구간에서 몇개의 장애물에 걸리는지를 이진 탐색으로 판단
 // -> O(h * logn)
+
+// 누적합으로도 해결 가능

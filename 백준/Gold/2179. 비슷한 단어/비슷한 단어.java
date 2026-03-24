@@ -1,76 +1,75 @@
 import java.util.*;
 import java.io.*;
 
-class Node {
-  Map<Character, Node> child;
-  int firstIdx;     // 해당 노드 가장 먼저 탐색한 문자열 인덱스
-  
-  Node() {
-    this.child = new HashMap<>();
-    this.firstIdx = -1;
-  }
-}
-
 class Solution {
-  
-  Node root;
-  int maxLen;
-  int idx1, idx2;   // 정답 문자열 인덱스
-  String[] arr;
-  
   void solution() throws IOException {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     int n = Integer.parseInt(br.readLine());
     
-    root = new Node();   // 루트 노드
-    
-    maxLen = 0;
-    idx1 = -1;
-    idx2 = -1;
-    arr = new String[n];
+    String[] origin = new String[n];      // 원본 배열
+    String[] arr = new String[n];
     for (int i=0; i<n; i++) {
-      arr[i] = br.readLine();
-      add(arr[i], i);
+      origin[i] = br.readLine();
+      arr[i] = origin[i];
     }
     
-    System.out.println(arr[idx1]);
-    System.out.println(arr[idx2]);
-    br.close();
-  }
-  
-  void add(String str, int strIdx) {
-    Node cur = root;
+    Arrays.sort(arr);   // 사전순 정렬
     
-    for (int i=0; i<str.length(); i++) {
-      char c = str.charAt(i);
+    Set<String> set = new HashSet<>();    // max 접두어 Set
+    int maxLen = 0;
+    for (int i=0; i<n-1; i++) {
+      String s1 = arr[i];
+      String s2 = arr[i+1];
       
-      if (!cur.child.containsKey(c)) {
-        Node node = new Node();
-        node.firstIdx = strIdx;
-        
-        cur.child.put(c, node);
-        
-        cur = node;   // 다음 노드로 이동
-      } else {      // 이미 해당 노드가 존재하는 경우
-        int preIdx = cur.child.get(c).firstIdx;
-        int curLen = i+1;
+      int len = calc(s1, s2);
       
-        if (curLen > maxLen) {
-          maxLen = curLen;
-          idx1 = preIdx;
-          idx2 = strIdx;
-        } else if (curLen == maxLen) {    // 문제 조건
-          if (idx1 > preIdx) {
-            idx1 = preIdx;
-            idx2 = strIdx;
-          } else if (idx1 == preIdx && idx2 > strIdx) {
-            idx2 = strIdx;
-          }
-        }
+      if (maxLen < len) {
+        maxLen = len;
         
-        cur = cur.child.get(c);   // 다음 노드로 이동
+        set.clear();    // 기존 Set 비우기
+        set.add(s1.substring(0, maxLen));
+      } else if (maxLen == len) {   // set에 s1, s2 도 add
+        set.add(s1.substring(0, maxLen));
       }
     }
+    
+    String[] res = new String[2];
+    String validPre = "";
+    int idx = 0;
+    for (int i=0; i<n; i++) {
+      if (origin[i].length() < maxLen) continue;
+      
+      String curPre = origin[i].substring(0, maxLen);
+      
+      if (set.contains(curPre)) {
+        if (idx == 0) validPre = curPre;
+        else {
+          // validPre 와 같아야 정답
+          if (!validPre.equals(curPre)) continue;
+        }  
+          
+         
+        res[idx++] = origin[i];
+        
+        if (idx == 2) break;
+      }
+    }
+    
+    System.out.println(res[0]);
+    System.out.println(res[1]);
+  }
+  
+  int calc(String s1, String s2) {    // 겹치는 접두어 길이 구하기
+    int minLen = Math.min(s1.length(), s2.length());
+    
+    int res = 0;
+    for (int i=0; i<minLen; i++) {
+      if (s1.charAt(i) != s2.charAt(i)) break;
+      
+      res++;
+    }
+    
+    return res;
   }
 }
 
@@ -81,5 +80,5 @@ public class Main {
   }
 }
 
-// 완전 탐색 -> O(n제곱 * 100) -> 시간 초과
-// 트라이 자료구조 활용
+// 정렬 & 인접한 문자열끼리 비교해서 정답 후보 찾기
+// O(nlogn * l)

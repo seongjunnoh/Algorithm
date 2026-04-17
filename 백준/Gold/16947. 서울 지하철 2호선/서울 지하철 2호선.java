@@ -38,14 +38,33 @@ public class Main {
     inCycle = new boolean[n+1];
     findCycle();
     
+    // bfs 탐색 1번 -> dist 배열 구하기
+    int[] dist = new int[n+1];
+    Arrays.fill(dist, -1);
+    
+    Deque<Integer> q = new ArrayDeque<>();
+    for (int i=1; i<=n; i++) {
+      if (inCycle[i]) {   // 사이클 본체에 속하는 노드를 큐에 add(bfs 출발지점)
+        q.add(i);   
+        dist[i] = 0;
+      }
+    }
+    
+    while (!q.isEmpty()) {
+      int poll = q.poll();
+      
+      for (int next : graph[poll]) {
+        if (dist[next] == -1) {
+          dist[next] = dist[poll] + 1;
+          q.add(next);
+        }
+      }
+    }
+    
     // 정답 출력
     StringBuilder sb = new StringBuilder();
     for (int i=1; i<=n; i++) {
-      if (inCycle[i]) {   // i 노드가 사이클에 속하는 경우
-        sb.append("0").append(" ");
-      } else {    // i 노드가 사이클에 속하지 않는 경우
-        sb.append(bfs(i)).append(" ");
-      }
+      sb.append(dist[i]).append(" ");
     }
     
     System.out.println(sb.toString());
@@ -86,34 +105,13 @@ public class Main {
       if (edgeCount[i] >= 2) inCycle[i] = true;
     }
   }
-  
-  static int bfs(int node) {   // node와 가장 가까운 사이클에 속하는 노드까지의 거리 구하기
-    Deque<int[]> q = new ArrayDeque<>();
-    boolean[] visit = new boolean[n+1];
-    
-    q.add(new int[]{node, 0});
-    visit[node] = true;
-    
-    while (!q.isEmpty()) {
-      int[] poll = q.poll();
-      
-      if (inCycle[poll[0]]) return poll[1];   // 사이클에 속하는 노드
-      
-      for (int next : graph[poll[0]]) {
-        if (visit[next]) continue;
-        
-        visit[next] = true;
-        q.add(new int[]{next, poll[1] + 1});
-      }
-    }
-    
-    return -1;    // 여기까지 오면 안됨
-  }
 }
 
 // 사이클 본체, 사이클 본체와 연결된 트리 구조를 판단해야 한다
 // -> 사이클 본체에 포함되어 있다면 항상 2개 이상의 노드와 연결되어 있음
 // -> 노드와 연결된 간선 개수를 차감시키면서 탐색 진행
+// dfs 로도 구할 수 있나??
 
 // 사이클 본체에 포함되는 노드는 최단 거리가 0
 // 사이클 본체에 포함되지 않는 노드는, 사이클 본체 만날 때까지 bfs
+// -> 이것도 매번 bfs 하지 말고 다른 방법 생각해보기 (multi source bfs)
